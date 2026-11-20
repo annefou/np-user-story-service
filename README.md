@@ -49,9 +49,18 @@ through this form. The service never claims that someone signed something they d
    | Variable | What it is |
    | --- | --- |
    | `NANOPUB_PRIVATE_KEY` | RSA private key, base64 as in a nanopub profile. Use a key for **this service alone**, so it can be revoked without touching another identity. |
-   | `NANOPUB_ORCID` | the ORCID that signs, e.g. the agent's |
-   | `NANOPUB_NAME` | the name that goes with it |
-   | `NANOPUB_INTRO` | URI of the signer's introduction nanopublication, optional |
+   | `NANOPUB_ORCID` | the ORCID that stays accountable, recorded as `dct:creator` on everything published here |
+   | `NANOPUB_NAME` | the name that goes with it, e.g. `FAIR Climate Matchmaker form` |
+   | `NANOPUB_INTRO` | URI of the introduction nanopublication that declares this key, optional |
+
+   To make the key and its introduction:
+
+   ```sh
+   node tools/new-identity.mjs              # prints a key, publishes nothing
+   NANOPUB_PRIVATE_KEY=<that key> node tools/new-identity.mjs --publish   # publishes the introduction
+   ```
+
+   The key is printed once and stored nowhere: copy it straight into Netlify.
    | `SERVICE_URI` | a URI naming this service, recorded in each publication |
    | `ALLOWED_ORIGINS` | comma separated, default `https://annefou.github.io` |
 
