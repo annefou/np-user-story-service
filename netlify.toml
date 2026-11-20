@@ -4,7 +4,11 @@
   functions = "netlify/functions"
 
 [functions]
+  # @nanopub/sign reads its .wasm from disk with __dirname, so it must stay a real file
+  # beside the function rather than being inlined by the bundler.
   node_bundler = "esbuild"
+  external_node_modules = ["@nanopub/sign"]
+  included_files = ["node_modules/@nanopub/sign/**"]
 
 # The form lives in a dashboard on another origin, so the browser sends a preflight first.
 [[headers]]

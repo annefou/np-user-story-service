@@ -48,16 +48,15 @@ export default async function handler(request) {
     intro: process.env.NANOPUB_INTRO || "",
     service: process.env.SERVICE_URI || "https://w3id.org/fair2adapt/matchmaker-form",
   };
-  const rdf = buildNanopub(values, agent);
-
-  if (new URL(request.url).searchParams.get("dry")) {
-    return reply(200, { rdf, published: false }, origin);
-  }
-
+  const dry = Boolean(new URL(request.url).searchParams.get("dry"));
   const key = process.env.NANOPUB_PRIVATE_KEY;
-  if (!key || !agent.orcid) {
-    return reply(500, { error: "this service has no signing key configured" }, origin);
+  if (!agent.orcid || (!dry && !key)) {
+    if (!dry) return reply(500, { error: "this service has no signing key configured" }, origin);
+    agent.orcid = "https://orcid.org/0000-0000-0000-0000";   // so a dry run still shows the shape
   }
+
+  const rdf = buildNanopub(values, agent);
+  if (dry) return reply(200, { rdf, published: false }, origin);
 
   try {
     const { Nanopub, NpProfile, getNpServer } = await import("@nanopub/sign");
