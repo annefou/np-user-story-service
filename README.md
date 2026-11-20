@@ -79,6 +79,14 @@ through this form. The service never claims that someone signed something they d
 3. Point the dashboard at it: one annotation on the Research Object,
    `cca:page5Panel1Service`, holding the function URL. Nothing is rebuilt.
 
+## Secrets scanning
+
+Netlify looks for the value of every environment variable in the repository and fails the
+build when it finds one. The ORCID, the introduction URI and the name are public by design
+and appear in the README and the tools, so `netlify.toml` lists them under
+`SECRETS_SCAN_OMIT_KEYS`. `NANOPUB_PRIVATE_KEY` is deliberately not listed: if a key ever
+reaches the repository, the build should fail.
+
 ## What to watch
 
 Anyone who finds the URL can publish under this key, and nanopublications cannot be

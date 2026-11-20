@@ -3,6 +3,13 @@
   publish = "public"
   functions = "netlify/functions"
 
+[build.environment]
+  # The scanner looks for every environment value in the repository. Three of these are
+  # public by design: the ORCID, the agent's introduction nanopublication and its name are
+  # written into every nanopublication this service signs, and they appear in the README and
+  # in the tools. The key is not listed here, so a leaked key would still fail the build.
+  SECRETS_SCAN_OMIT_KEYS = "NANOPUB_NAME,NANOPUB_ORCID,NANOPUB_INTRO,SERVICE_URI,ALLOWED_ORIGINS"
+
 [functions]
   # @nanopub/sign reads its .wasm from disk with __dirname, so it must stay a real file
   # beside the function rather than being inlined by the bundler.
