@@ -44,11 +44,18 @@ through this form. The service never claims that someone signed something they d
 ## Deploying
 
 1. Create a Netlify site from this repository. The function is `netlify/functions/user-story.mjs`.
-2. Set these environment variables on the site:
+2. Set the identity on the site. Either paste a nanopub profile into one variable:
 
    | Variable | What it is |
    | --- | --- |
-   | `NANOPUB_PRIVATE_KEY` | RSA private key, base64 as in a nanopub profile. Use a key for **this service alone**, so it can be revoked without touching another identity. |
+   | `NANOPUB_PROFILE` | the contents of a `profile.yml`: `name`, `orcid_id`, `public_key`, `private_key`. There is no file system to point `private_key` at here, so the key must be **inline**, not a path. |
+   | `NANOPUB_ORCID` | needed when the profile's `orcid_id` names an agent rather than a person, as an agent profile does. The signing library accepts only `https://orcid.org/...` as the identity, and the agent is named through its introduction instead. |
+
+   Or set the parts separately:
+
+   | Variable | What it is |
+   | --- | --- |
+   | `NANOPUB_PRIVATE_KEY` | RSA private key, base64 as in a nanopub profile, inline. A key of its own can be revoked without touching another identity; an agent's key cannot. |
    | `NANOPUB_ORCID` | the ORCID that stays accountable, recorded as `dct:creator` on everything published here. The library insists this is an `https://orcid.org/...` URI. |
    | `NANOPUB_NAME` | the name that goes with the key, e.g. `claude-ai-agent` |
    | `NANOPUB_INTRO` | URI of the introduction nanopublication that declares the key. This is what makes an agent, rather than the person, the publisher: a story nobody signed for is then attributed to the agent. |

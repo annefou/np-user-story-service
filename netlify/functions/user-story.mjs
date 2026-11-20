@@ -10,6 +10,7 @@
  *   POST /.netlify/functions/user-story?dry=1   returns the RDF without signing it
  */
 
+import { identity } from "../../lib/profile.mjs";
 import { buildNanopub, validate } from "../../lib/user-story.mjs";
 
 const ALLOWED = (process.env.ALLOWED_ORIGINS || "https://annefou.github.io").split(",").map((o) => o.trim());
@@ -43,20 +44,12 @@ export default async function handler(request) {
   if (errors.length) return reply(400, { error: errors.join("; ") }, origin);
 
   // Who signs and who is accountable are two different identities: the key may belong to an
-  // agent while a person stays the creator, which is how these are published already. The
-  // library takes the ORCID and names the agent through its introduction nanopublication.
-  const agent = {
-    orcid: process.env.NANOPUB_ORCID,
-    signer: process.env.NANOPUB_INTRO || process.env.NANOPUB_ORCID,
-    name: process.env.NANOPUB_NAME || "FAIR Climate Matchmaker",
-    intro: process.env.NANOPUB_INTRO || "",
-    service: process.env.SERVICE_URI || "https://w3id.org/fair2adapt/matchmaker-form",
-  };
+  // agent while a person stays the creator, which is how these are published already.
+  const agent = identity(process.env);
   const dry = Boolean(new URL(request.url).searchParams.get("dry"));
-  const key = process.env.NANOPUB_PRIVATE_KEY;
-  if (!agent.orcid || (!dry && !key)) {
-    if (!dry) return reply(500, { error: "this service has no signing identity configured" }, origin);
-    agent.orcid = "https://orcid.org/0000-0000-0000-0000";   // a dry run still shows the shape
+  if (agent.missing.length) {
+    if (!dry) return reply(500, { error: `this service is missing ${agent.missing.join(" and ")}` }, origin);
+    agent.orcid = agent.orcid || "https://orcid.org/0000-0000-0000-0000";   // a dry run still shows the shape
     agent.signer = agent.signer || agent.orcid;
   }
 
@@ -65,7 +58,7 @@ export default async function handler(request) {
 
   try {
     const { Nanopub, NpProfile, getNpServer } = await import("@nanopub/sign");
-    const profile = new NpProfile(key.replace(/\s+/g, ""), agent.orcid, agent.name, agent.intro);
+    const profile = new NpProfile(agent.key, agent.orcid, agent.name, agent.intro);
     const published = await new Nanopub(rdf).publish(profile, getNpServer(false));
     const info = published.info();
     return reply(200, { published: true, uri: info.published || info.uri, info }, origin);
