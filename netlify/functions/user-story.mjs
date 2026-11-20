@@ -56,12 +56,20 @@ export default async function handler(request) {
   const rdf = buildNanopub(values, agent);
   if (dry) return reply(200, { rdf, published: false }, origin);
 
+  // `?sign=1` proves the signer works here without putting anything on the network, which
+  // matters because a nanopublication cannot be withdrawn once it is published.
+  const signOnly = Boolean(new URL(request.url).searchParams.get("sign"));
+
   try {
     const { Nanopub, NpProfile, getNpServer } = await import("@nanopub/sign");
     const profile = new NpProfile(agent.key, agent.orcid, agent.name, agent.intro);
+    if (signOnly) {
+      const signed = new Nanopub(rdf).sign(profile);
+      return reply(200, { published: false, signed: true, uri: signed.info().uri?.value || null }, origin);
+    }
     const published = await new Nanopub(rdf).publish(profile, getNpServer(false));
     const info = published.info();
-    return reply(200, { published: true, uri: info.published || info.uri, info }, origin);
+    return reply(200, { published: true, uri: info.published?.value || info.uri?.value || info.published || info.uri, info }, origin);
   } catch (error) {
     return reply(502, { error: `could not publish: ${error?.message || error}` }, origin);
   }
