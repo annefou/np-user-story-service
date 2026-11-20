@@ -1,0 +1,74 @@
+# np-user-story-service
+
+Publishes a FAIR2Adapt **user story** as a signed nanopublication, for a web form that
+cannot hold a key.
+
+The form lives in the FAIR Climate Matchmaker dashboard
+([annefou/fdo-compose](https://github.com/annefou/fdo-compose)), which is served from
+GitHub Pages. A static page cannot sign anything, so it collects the answers and posts them
+here; this signs them with the key in the environment and publishes them to the
+nanopublication network.
+
+The statements follow the
+[User Story template](https://w3id.org/np/RACciFqZEUYYrteZnGikqUEV8ZRVYfJNB3bzy98X5s_qw).
+They are written out in `lib/user-story.mjs` rather than instantiated from the template, so
+that what gets signed can be read in one screen. A second template means a second builder,
+or a general instantiator.
+
+## Endpoint
+
+```
+POST /.netlify/functions/user-story
+{
+  "label":     "Knowledge broker finds the stories for a region",
+  "user":      "knowledge broker at a regional agency",       // As a ...
+  "action":    "find the stories relevant to a region",       // I want to ...
+  "purpose":   "I can point people to what exists",           // so that ...
+  "domain":    ["http://aims.fao.org/aos/agrovoc/c_10967"],   // optional, repeatable
+  "challenge": ["https://w3id.org/fff/..."],                  // optional, repeatable
+  "exposed":   ["https://w3id.org/fff/..."],                  // optional, repeatable
+  "DO":        ["https://w3id.org/..."],                      // optional, repeatable
+  "authorName":  "Jane Doe",                                  // optional
+  "authorOrcid": "https://orcid.org/0000-0002-1825-0097"      // optional
+}
+→ { "published": true, "uri": "https://w3id.org/np/RA..." }
+```
+
+Add `?dry=1` to get the RDF back without signing or publishing it. Useful for checking a
+change before it reaches the network.
+
+**Attribution.** With an ORCID, the assertion is attributed to that person. Without one, it
+is attributed to the agent whose key signs it, and the publication says it was collected
+through this form. The service never claims that someone signed something they did not.
+
+## Deploying
+
+1. Create a Netlify site from this repository. The function is `netlify/functions/user-story.mjs`.
+2. Set these environment variables on the site:
+
+   | Variable | What it is |
+   | --- | --- |
+   | `NANOPUB_PRIVATE_KEY` | RSA private key, base64 as in a nanopub profile. Use a key for **this service alone**, so it can be revoked without touching another identity. |
+   | `NANOPUB_ORCID` | the ORCID that signs, e.g. the agent's |
+   | `NANOPUB_NAME` | the name that goes with it |
+   | `NANOPUB_INTRO` | URI of the signer's introduction nanopublication, optional |
+   | `SERVICE_URI` | a URI naming this service, recorded in each publication |
+   | `ALLOWED_ORIGINS` | comma separated, default `https://annefou.github.io` |
+
+3. Point the dashboard at it: one annotation on the Research Object,
+   `cca:page5Panel1Service`, holding the function URL. Nothing is rebuilt.
+
+## What to watch
+
+Anyone who finds the URL can publish under this key, and nanopublications cannot be
+withdrawn. The defences here are modest on purpose: an origin check, a honeypot field,
+length limits, and a key that belongs to nothing else. If the form starts attracting
+rubbish, add a captcha and a queue that you approve before publishing.
+
+## Checking it locally
+
+```sh
+npm install
+node tools/preview.mjs     # print the RDF for a sample story
+node tools/sign-check.mjs  # sign it with a throwaway key and validate; publishes nothing
+```

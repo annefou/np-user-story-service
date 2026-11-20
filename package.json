@@ -1,0 +1,14 @@
+{
+  "name": "np-user-story-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Publishes a FAIR2Adapt user story as a signed nanopublication, for a web form that cannot hold a key",
+  "scripts": {
+    "build": "node tools/preview.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@nanopub/sign": "0.2.0"
+  }
+}
