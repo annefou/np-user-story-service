@@ -49,11 +49,16 @@ through this form. The service never claims that someone signed something they d
    | Variable | What it is |
    | --- | --- |
    | `NANOPUB_PRIVATE_KEY` | RSA private key, base64 as in a nanopub profile. Use a key for **this service alone**, so it can be revoked without touching another identity. |
-   | `NANOPUB_ORCID` | the ORCID that stays accountable, recorded as `dct:creator` on everything published here |
-   | `NANOPUB_NAME` | the name that goes with it, e.g. `FAIR Climate Matchmaker form` |
-   | `NANOPUB_INTRO` | URI of the introduction nanopublication that declares this key, optional |
+   | `NANOPUB_ORCID` | the ORCID that stays accountable, recorded as `dct:creator` on everything published here. The library insists this is an `https://orcid.org/...` URI. |
+   | `NANOPUB_NAME` | the name that goes with the key, e.g. `claude-ai-agent` |
+   | `NANOPUB_INTRO` | URI of the introduction nanopublication that declares the key. This is what makes an agent, rather than the person, the publisher: a story nobody signed for is then attributed to the agent. |
 
-   To make the key and its introduction:
+   Signing with an existing agent, rather than a new key: take the key from that agent's
+   profile (for `claude-ai-agent`, the file `aiagent_rsa` beside its `profile.yml`), set
+   `NANOPUB_INTRO` to the agent's URI, and leave `NANOPUB_ORCID` as the person's ORCID.
+   `node tools/sign-as-agent.mjs <profile-dir>` signs a sample that way without publishing it.
+
+   To make a key of its own instead:
 
    ```sh
    node tools/new-identity.mjs              # prints a key, publishes nothing
