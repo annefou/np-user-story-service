@@ -63,14 +63,17 @@ export default async function handler(request) {
   const signOnly = Boolean(new URL(request.url).searchParams.get("sign"));
 
   try {
-    const { Nanopub, NpProfile, getNpServer } = await import("@nanopub/sign");
+    const { Nanopub, NpProfile } = await import("@nanopub/sign");
     const profile = new NpProfile(agent.key, agent.orcid, agent.name, agent.intro);
     if (signOnly) {
       const signed = new Nanopub(rdf).sign(profile);
       return reply(200, { published: false, signed: true, ignored: values.ignored,
         uri: signed.info().uri?.value || null }, origin);
     }
-    const published = await new Nanopub(rdf).publish(profile, getNpServer(false));
+    // The library's default registry (registry.np.trustyuri.net) stopped answering; publish
+    // where Science Live does, unless NANOPUB_SERVER says otherwise
+    const server = process.env.NANOPUB_SERVER || "https://registry.knowledgepixels.com/";
+    const published = await new Nanopub(rdf).publish(profile, server);
     const info = published.info();
     return reply(200, { published: true, ignored: values.ignored,
       uri: info.published?.value || info.uri?.value || info.published || info.uri }, origin);

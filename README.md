@@ -78,6 +78,7 @@ through this form. The service never claims that someone signed something they d
 
    The key is printed once and stored nowhere: copy it straight into Netlify.
    | `SERVICE_URI` | a URI naming this service, recorded in each publication |
+   | `NANOPUB_SERVER` | optional: the registry to publish to. Default `https://registry.knowledgepixels.com/`, where Science Live publishes; the signing library's own default, `registry.np.trustyuri.net`, stopped answering. `https://test.registry.knowledgepixels.com/` publishes to the test network instead. |
    | `ALLOWED_ORIGINS` | comma separated, default `https://annefou.github.io`. Add `https://platform.sciencelive4all.org` for the Science Live form embedded in the dashboard (`/embed/create`). |
 
 3. Point the dashboard at it: one annotation on the Research Object,
