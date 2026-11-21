@@ -11,7 +11,8 @@ nanopublication network.
 
 The statements follow the
 [User Story template](https://w3id.org/np/RACciFqZEUYYrteZnGikqUEV8ZRVYfJNB3bzy98X5s_qw).
-They are written out in `lib/user-story.mjs` rather than instantiated from the template, so
+in the template's vocabulary, Barbara Magagna's FAIRification Framework Ontology
+(`https://w3id.org/fff/`). They are written out in `lib/user-story.mjs` rather than instantiated from the template, so
 that what gets signed can be read in one screen. A second template means a second builder,
 or a general instantiator.
 
@@ -24,10 +25,13 @@ POST /.netlify/functions/user-story
   "user":      "knowledge broker at a regional agency",       // As a ...
   "action":    "find the stories relevant to a region",       // I want to ...
   "purpose":   "I can point people to what exists",           // so that ...
-  "domain":    ["http://aims.fao.org/aos/agrovoc/c_10967"],   // optional, repeatable
-  "challenge": ["https://w3id.org/fff/..."],                  // optional, repeatable
-  "exposed":   ["https://w3id.org/fff/..."],                  // optional, repeatable
+  "id":        "F2A-CS2-US4",                                 // optional short name, used in the address
+  "domain":    ["http://aims.fao.org/aos/agrovoc/c_10967"],   // at least one
+  "challenge": ["http://connectivity-hub.com/terms/..."],     // at least one (a risk)
+  "exposed":   ["http://connectivity-hub.com/terms/..."],     // at least one (an exposed sector)
   "DO":        ["https://w3id.org/..."],                      // optional, repeatable
+  "labels":    { "http://connectivity-hub.com/terms/...": "Flood" },  // optional: names of picked terms
+  "example":   true,                                          // optional: publish as npx:ExampleNanopub
   "authorName":  "Jane Doe",                                  // optional
   "authorOrcid": "https://orcid.org/0000-0002-1825-0097"      // optional
 }
@@ -74,7 +78,7 @@ through this form. The service never claims that someone signed something they d
 
    The key is printed once and stored nowhere: copy it straight into Netlify.
    | `SERVICE_URI` | a URI naming this service, recorded in each publication |
-   | `ALLOWED_ORIGINS` | comma separated, default `https://annefou.github.io` |
+   | `ALLOWED_ORIGINS` | comma separated, default `https://annefou.github.io`. Add `https://platform.sciencelive4all.org` for the Science Live form embedded in the dashboard (`/embed/create`). |
 
 3. Point the dashboard at it: one annotation on the Research Object,
    `cca:page5Panel1Service`, holding the function URL. Nothing is rebuilt.
