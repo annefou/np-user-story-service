@@ -27,7 +27,9 @@ const reply = (status, body, origin) =>
 
 export default async function handler(request) {
   const origin = request.headers.get("origin") || "";
-  if (request.method === "OPTIONS") return new Response("", { status: 204, headers: cors(origin) });
+  // A 204 must have no body at all: Response("", {status: 204}) throws, which failed every
+  // browser preflight before a form could post its JSON
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(origin) });
   if (request.method !== "POST") return reply(405, { error: "post a user story here" }, origin);
   if (origin && !ALLOWED.includes("*") && !ALLOWED.includes(origin)) {
     return reply(403, { error: "this form is not allowed to publish here" }, origin);
