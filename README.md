@@ -10,7 +10,7 @@ here; this signs them with the key in the environment and publishes them to the
 nanopublication network.
 
 The statements follow the
-[User Story template](https://w3id.org/np/RACciFqZEUYYrteZnGikqUEV8ZRVYfJNB3bzy98X5s_qw).
+[User Story template](https://w3id.org/np/RAFwCQ_DZmx01WR4yzhzghLYK5xafhG6KmNB0Dy8jShZg).
 in the template's vocabulary, Barbara Magagna's FAIRification Framework Ontology
 (`https://w3id.org/fff/`). They are written out in `lib/user-story.mjs` rather than instantiated from the template, so
 that what gets signed can be read in one screen. A second template means a second builder,
