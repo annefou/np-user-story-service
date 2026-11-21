@@ -65,11 +65,13 @@ export default async function handler(request) {
     const profile = new NpProfile(agent.key, agent.orcid, agent.name, agent.intro);
     if (signOnly) {
       const signed = new Nanopub(rdf).sign(profile);
-      return reply(200, { published: false, signed: true, uri: signed.info().uri?.value || null }, origin);
+      return reply(200, { published: false, signed: true, ignored: values.ignored,
+        uri: signed.info().uri?.value || null }, origin);
     }
     const published = await new Nanopub(rdf).publish(profile, getNpServer(false));
     const info = published.info();
-    return reply(200, { published: true, uri: info.published?.value || info.uri?.value || info.published || info.uri, info }, origin);
+    return reply(200, { published: true, ignored: values.ignored,
+      uri: info.published?.value || info.uri?.value || info.published || info.uri }, origin);
   } catch (error) {
     return reply(502, { error: `could not publish: ${error?.message || error}` }, origin);
   }
